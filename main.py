@@ -1,36 +1,62 @@
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from starlette.requests import Request
-from fastapi import FastAPI, Request, File, UploadFile
+from fastapi import FastAPI, Request, File, UploadFile, Depends
+from fastapi.templating import Jinja2Templates
 import base64
+from sqlalchemy.orm import Session
+from database import SessionLocal, Image, engine, Base
+
 
 # Создаем FastAPI приложение
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 
+# Функция для получения сессии БД
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def home(request: Request, db: Session = Depends(get_db)):
+    # Получаем последнее загруженное изображение
+    last_image = db.query(Image).order_by(Image.id.desc()).first()
+
+    if last_image:
+        encoded_image = base64.b64encode(last_image.image_data).decode("utf-8")
+        mime_type = last_image.mime_type
+    else:
+        encoded_image = None
+        mime_type = None
+
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "encoded_image": encoded_image,
+        "mime_type": mime_type
+    })
 
 @app.post("/")
-async def upload_image(request: Request, file: UploadFile = File(...)):
+async def upload_image(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
     # Проверка типа содержимого
     if not file.content_type.startswith("image/"):
         return templates.TemplateResponse("index.html", {
             "request": request,
             "error": "Файл не является изображением"
         })
-
-    # Чтение и кодирование изображения
+    # Читаем файл
     image_data = await file.read()
-    encoded_image = base64.b64encode(image_data).decode("utf-8")
 
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "mime_type": file.content_type,
-        "encoded_image": encoded_image
-    })
+    # Сохраняем в БД
+    new_image = Image(image_data=image_data, mime_type=file.content_type)
+    db.add(new_image)
+    db.commit()
+
+    return await home(request, db)  # Перенаправляем на главную
+
+
 
 @app.get("/image_rotate", response_class=HTMLResponse)
 async def image_rotate(request: Request):
