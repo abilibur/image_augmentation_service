@@ -24,35 +24,43 @@
         <!-- Основной контент -->
         <div class="container mt-4">
             {% block content %}
-            <h1 class="mb-4">111</h1>
+            <h1 class="mb-4">Загрузка изображений</h1>
             <div class="row">
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow">
+                <div class="col-12 mb-3">
+                    <div class="card shadow w-100">
                         <div class="card-body">
+                        <h5>Загрузите ваше изображение</h5>
 
-    <h1>Upload Image</h1>
+                        <form action="/" method="post" enctype="multipart/form-data">
+                            <input type="file" name="file" accept="image/*" required>
+                            <button type="submit">Загрузка</button>
+                        </form>
 
-    <form action="/" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept="image/*" required>
-        <button type="submit">Upload</button>
-    </form>
-
-    {% if error %}
-        <div style="color: red;">{{ error }}</div>
-    {% endif %}
+                        {% if error %}
+                        <div style="color: red;">{{ error }}</div>
+                        {% endif %}
 
                         </div>
                     </div>
                 </div>
             </div>
 
-                {% if encoded_image %}
-    <h2>Uploaded Image:</h2>
-    <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
-         alt="Uploaded Image"
-         style="max-width: 500px;">
-    {% endif %}
-
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <div class="card shadow w-100">
+                        <div class="card-body">
+                            {% if encoded_image %}
+                            <h5>Ваше изображение:</h5>
+                            <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
+                                alt="Загруженное изображение"
+                                class="mb-4 img-fluid">
+                            {% else %}
+                            <p>Изображение не загружено</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endblock %}
         </div>
 

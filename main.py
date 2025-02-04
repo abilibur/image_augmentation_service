@@ -1,4 +1,3 @@
-from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from starlette.requests import Request
