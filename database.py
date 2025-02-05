@@ -19,7 +19,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # Определение модели хранения изображений
-class Image(Base):
+class Image_db(Base):
     __tablename__ = "images"
 
     id = Column(Integer, primary_key=True, index=True) # Уникальный ID
@@ -41,3 +41,11 @@ async def lifespan(app:FastAPI):
         # Освобождаем неиспользуемое пространство
         conn.execute(text("VACUUM"))  # Уменьшаем размер файла БД
         conn.commit()
+
+    # Функция для получения сессии БД
+async def get_db():
+    db = SessionLocal()
+    try:
+       yield db
+    finally:
+        db.close()

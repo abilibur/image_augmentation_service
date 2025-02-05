@@ -1,68 +1,46 @@
 from fastapi.responses import HTMLResponse
-from fastapi import FastAPI, Request, File, UploadFile, Depends
+from fastapi import FastAPI, Request, File, UploadFile
 from fastapi.templating import Jinja2Templates
-import base64
-from sqlalchemy.orm import Session
-from database import SessionLocal, Image, lifespan
+from image_processing import ImageSingleton
 
 
 # Создаем FastAPI приложение
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-
-
-# Функция для получения сессии БД
-async def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+img = ImageSingleton()
 
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request, db: Session = Depends(get_db)):
-    # Получаем последнее загруженное изображение
-    first_image = db.query(Image).order_by(Image.id.asc()).first()
-
-    if first_image:
-        encoded_image = base64.b64encode(first_image.image_data).decode("utf-8")
-        mime_type = first_image.mime_type
-    else:
-        encoded_image = None
-        mime_type = None
-
+async def home(request: Request):
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "encoded_image": encoded_image,
-        "mime_type": mime_type
+        "encoded_image": img.get_image(),
+        "mime_type": img.get_image_type()
     })
 
 @app.post("/")
-async def upload_image(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_image(request: Request, file: UploadFile = File(...)):
 
     # Проверка типа содержимого
     if not file.content_type.startswith("image/"):
-        first_image = db.query(Image).order_by(Image.id.asc()).first()
-        encoded_image = base64.b64encode(first_image.image_data).decode("utf-8") if first_image else None
-        mime_type = first_image.mime_type if first_image else None
-
         return templates.TemplateResponse("index.html", {
             "request": request,
             "error": "Файл не является изображением",
-            "encoded_image": encoded_image,
-            "mime_type": mime_type
+            "encoded_image": img.get_image(),
+            "mime_type": img.get_image_type()
         })
+
     # Читаем файл
     image_data = await file.read()
 
-    # Сохраняем в БД
-    new_image = Image(image_data=image_data, mime_type=file.content_type)
-    db.add(new_image)
-    db.commit()
+    # загружаем данные файла в класс Singleton
+    img.set_image_with_type(image_data, file.content_type)
 
-    return await home(request, db)  # Перенаправляем на главную
-
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "encoded_image": img.get_image(),
+        "mime_type": img.get_image_type()
+    })
 
 
 @app.get("/image_rotate", response_class=HTMLResponse)
