@@ -1,0 +1,21 @@
+{% extends "index.html" %}
+
+{% block content %}
+          <h1 class="mb-4">Вы выбрали повернуть картинку</h1>
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <div class="card shadow w-100">
+                        <div class="card-body">
+                            {% if encoded_image %}
+                            <h5>Ваше изображение:</h5>
+                            <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
+                                alt="Загруженное изображение"
+                                class="mb-4 img-fluid">
+                            {% else %}
+                            <p>Изображение не загружено</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+{% endblock %}
