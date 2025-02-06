@@ -74,6 +74,8 @@ async def rotate(request: Request, db = Depends(get_db)):
         {"encoded_image": rotate_process.get_image(db),
          "mime_type": rotate_process.get_image_type(db)},
         {"encoded_image": rotate_process.get_image(db),
+         "mime_type": rotate_process.get_image_type(db)},
+        {"encoded_image": rotate_process.get_image(db),
          "mime_type": rotate_process.get_image_type(db)}
     ]
     return templates.TemplateResponse("rotate.html", {
