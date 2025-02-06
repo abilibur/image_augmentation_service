@@ -62,16 +62,39 @@ async def upload_image(request: Request, file: UploadFile = File(...), db = Depe
 @app.get("/rotate", response_class=HTMLResponse)
 async def rotate(request: Request, db = Depends(get_db)):
     rotate_process.generate_images(db)
+    images = [
+        {"encoded_image": rotate_process.get_image(db),
+        "mime_type": rotate_process.get_image_type(db)},
+        {"encoded_image": rotate_process.get_image(db),
+         "mime_type": rotate_process.get_image_type(db)},
+        {"encoded_image": rotate_process.get_image(db),
+         "mime_type": rotate_process.get_image_type(db)},
+        {"encoded_image": rotate_process.get_image(db),
+         "mime_type": rotate_process.get_image_type(db)},
+        {"encoded_image": rotate_process.get_image(db),
+         "mime_type": rotate_process.get_image_type(db)},
+        {"encoded_image": rotate_process.get_image(db),
+         "mime_type": rotate_process.get_image_type(db)}
+    ]
     return templates.TemplateResponse("rotate.html", {
         "request": request,
-        "encoded_image": rotate_process.get_image(db),
-        "mime_type": rotate_process.get_image_type(db)
+        "rotate_images": images
     })
 
 @app.get("/color_correction", response_class=HTMLResponse)
-async def color_correction(request: Request):
-    return templates.TemplateResponse("color_correction.html", {"request": request})
+async def color_correction(request: Request, db = Depends(get_db)):
+    color_correction_process.generate_images(db)
+    return templates.TemplateResponse("color_correction.html", {
+        "request": request,
+        "encoded_image": color_correction_process.get_image(db),
+        "mime_type": color_correction_process.get_image_type(db)
+    })
 
 @app.get("/distortion", response_class=HTMLResponse)
-async def distortion(request: Request):
-    return templates.TemplateResponse("distortion.html", {"request": request})
+async def distortion(request: Request, db = Depends(get_db)):
+    distortion_process.generate_images(db)
+    return templates.TemplateResponse("distortion.html", {
+        "request": request,
+        "encoded_image": distortion_process.get_image(db),
+        "mime_type": distortion_process.get_image_type(db)
+    })
