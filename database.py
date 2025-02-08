@@ -31,7 +31,11 @@ class Database:
     def clear_database(self):
         """Очищает таблицу перед завершением работы сервера."""
         with self.engine.connect() as conn:
-            conn.execute(text("DELETE FROM images"))  # Удаляем все записи
+
+            conn.execute(text("DELETE FROM images"))  # Удаляем все записи images
+            conn.execute(text("DELETE FROM rotate_images"))  # Удаляем все записи rotate_images
+            conn.execute(text("DELETE FROM color_correction_images"))  # Удаляем все записи color_correction_images
+            conn.execute(text("DELETE FROM distortion_images"))  # Удаляем все записи distortion_images
             conn.commit()
             # Освобождаем неиспользуемое пространство
             conn.execute(text("VACUUM"))  # Уменьшаем размер файла БД
