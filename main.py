@@ -59,6 +59,8 @@ async def upload_image(request: Request, file: UploadFile = File(...), db = Depe
     })
 
 
+
+
 @app.get("/rotate", response_class=HTMLResponse)
 async def rotate(request: Request, db = Depends(get_db)):
     return templates.TemplateResponse("rotate.html", {
@@ -79,6 +81,8 @@ async def do_rotate(request: Request, angle: int = Form(...),
         "request": request,
         "rotate_images": rotate_process.get_images(db)
     })
+
+
 
 
 

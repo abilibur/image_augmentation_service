@@ -26,15 +26,17 @@ class Rotate(ImageProcessing):
            генерирует повернутые изображения и записывает их в БД """
         # Удаляем предыдущее изображение
         db.query(ImageRotate).delete()
+        # Достаем загруженное пользователем изображение
         image_entry = db.query(ImageDB).first()
 
-        rotate_images()
-        # Добавляем новое изображение если в таблице images есть изображение
-        if image_entry:
-            new_image = ImageRotate(image_data=image_entry.image_data, mime_type=image_entry.mime_type)
+        images = rotate_images(orig_image=image_entry, angle=options["angle"], count=options["count"])
+
+        for img in images:
+            # Добавляем новое изображение если в таблице images есть изображение
+            new_image = ImageRotate(image_data=img, mime_type="image/jpeg")
             db.add(new_image)
-            db.commit()
-            db.refresh(new_image)  # Обновляем объект, чтобы получить актуальные данные
+
+        db.commit()
 
     def get_images(self, db):
         """Возвращает текущее изображение из БД"""
