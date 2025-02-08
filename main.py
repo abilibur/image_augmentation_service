@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from database import Database
 from image_singleton import ImageSingleton
 from image_processing_factory import ImageProcessingFactory
+import os
 
 templates = Jinja2Templates(directory="templates")
 # Создаём экземпляр базы данных
@@ -12,6 +13,9 @@ db_instance = Database()
 # Создаем FastAPI приложение
 app = FastAPI(lifespan=db_instance.lifespan)
 
+
+SAVE_DIR = "augmented_images"
+os.makedirs(SAVE_DIR, exist_ok=True)
 # Создаем экземпляр класса изображения
 img = ImageSingleton()
 # Создаем фабрику различных процессов обработки изображений
@@ -49,6 +53,9 @@ async def upload_image(request: Request, file: UploadFile = File(...), db = Depe
         })
     # Читаем файл
     image_data = await file.read()
+    
+    # Получаем имя загруженного файла
+    filename = file.filename
     # Загружаем данные файла в класс Singleton
     img.set_image_with_type(db, image_data, file.content_type)
 
@@ -57,8 +64,6 @@ async def upload_image(request: Request, file: UploadFile = File(...), db = Depe
         "encoded_image": img.get_image(db),
         "mime_type": img.get_image_type(db)
     })
-
-
 
 
 @app.get("/rotate", response_class=HTMLResponse)
@@ -82,7 +87,14 @@ async def do_rotate(request: Request, angle: int = Form(...),
         "rotate_images": rotate_process.get_images(db)
     })
 
+@app.post("/save_rotate")
+async def save_images(request: Request, db = Depends(get_db), save_dir=SAVE_DIR):
+    rotate_process.save_images(db, save_dir)
 
+    return templates.TemplateResponse("rotate.html", {
+        "request": request,
+        "rotate_images": rotate_process.get_images(db)
+    })
 
 
 
@@ -91,8 +103,7 @@ async def color_correction(request: Request, db = Depends(get_db)):
     # color_correction_process.generate_images(db, options)
     return templates.TemplateResponse("color_correction.html", {
         "request": request,
-        "encoded_image": color_correction_process.get_images(db),
-        "mime_type": color_correction_process.get_image_type(db)
+        "color_correction_images": color_correction_process.get_images(db)
     })
 
 @app.get("/distortion", response_class=HTMLResponse)
@@ -100,6 +111,5 @@ async def distortion(request: Request, db = Depends(get_db)):
     # distortion_process.generate_images(db)
     return templates.TemplateResponse("distortion.html", {
         "request": request,
-        "encoded_image": distortion_process.get_images(db),
-        "mime_type": distortion_process.get_image_type(db)
+        "distortion_images": distortion_process.get_images(db)
     })

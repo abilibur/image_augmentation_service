@@ -4,6 +4,7 @@
 <h1 class="mb-4">Давайте сделаем набор картинок с поворотом</h1>
 
     <!-- Поля и кнопки -->
+<div class="d-flex gap-1 mb-4">
     <form action="/do_rotate" method="post" class="d-flex flex-wrap gap-1 align-items-center mb-4">
         <div class="d-flex align-items-center mb-4">
             <label for="angle" class="form-label me-1">Шаг угла (°):</label>
@@ -15,10 +16,14 @@
         </div>
         <div class="d-flex gap-1 mb-4 ">
             <button type="submit" class="btn btn-primary">Повернуть</button>
-            <button type="submit" formaction="/save" class="btn btn-success">Сохранить</button>
         </div>
     </form>
-
+    <form action="/save_rotate" method="post" class="d-flex flex-wrap gap-1 align-items-center mb-4">
+        <div class="d-flex gap-1 mb-4 ">
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </div>
+    </form>
+</div>
     <div class="row">
         {% if rotate_images %}
         {% for img in rotate_images %}
@@ -34,7 +39,7 @@
         </div>
         {% endfor %}
         {% else %}
-            <p>Изображения не загружены</p>
+            <p>Введите параметры для поворота</p>
         {% endif %}
     </div>
 {% endblock %}

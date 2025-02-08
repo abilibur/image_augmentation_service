@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from database_models import ImageDB, ImageRotate, ImageColorCorrection, ImageDistortion
 import base64
 from image_proceccing_methods import rotate_images
+import os
 
 # Базовый класс для всех типов обработки изображений
 class ImageProcessing(ABC):
@@ -12,10 +13,8 @@ class ImageProcessing(ABC):
     def get_images(self, db):
         pass
     @abstractmethod
-    def get_image_type(self, db):
+    def save_images(self, db, save_dir):
         pass
-
-
 
 
 
@@ -28,6 +27,9 @@ class Rotate(ImageProcessing):
         db.query(ImageRotate).delete()
         # Достаем загруженное пользователем изображение
         image_entry = db.query(ImageDB).first()
+        if db.query(ImageDB).count() == 0:
+            print(f"Таблица {ImageDB.__tablename__} данных пуста")
+            return None
 
         images = rotate_images(orig_image=image_entry, angle=options["angle"], count=options["count"])
 
@@ -39,32 +41,36 @@ class Rotate(ImageProcessing):
         db.commit()
 
     def get_images(self, db):
-        """Возвращает текущее изображение из БД"""
+        """Возвращает текущие изображения из БД"""
         image_entry = db.query(ImageRotate).all()
 
         if db.query(ImageRotate).count() == 0:
-            print("База данных пуста")
+            print(f"Таблица {ImageRotate.__tablename__} данных пуста")
             return None
 
         images = []  # Список для хранения изображений
         for img in image_entry:
             encoded_image = base64.b64encode(img.image_data).decode("utf-8")
             images.append({
-                "mime_type": img.mime_type,  # Замените 'mime_type' на правильное поле
+                "mime_type": img.mime_type,
                 "encoded_image": encoded_image
             })
         return images
 
+    def save_images(self, db, save_dir):
+        """Сохранение повернутых изображений на жесткий диск пользователя"""
+        image_entry = db.query(ImageRotate).all()
 
-    def get_image_type(self, db):
-        # """Возвращает текущий тип изображения из БД"""
-        # image_entry = db.query(ImageRotate).first()
-        # if image_entry:
-        #     return image_entry.mime_type
-        # return None
-        pass
+        if db.query(ImageRotate).count() == 0:
+            print(f"Таблица {ImageRotate.__tablename__} данных пуста")
+            return None
 
+        for index, img in enumerate(image_entry):
+            image_data = img.image_data
+            file_path = os.path.join(save_dir, f"rotated_image_{index + 1}.jpg")
 
+            with open(file_path, "wb") as image_file:
+                image_file.write(image_data)
 
 
 
@@ -83,19 +89,25 @@ class ColorCorrection(ImageProcessing):
             db.refresh(new_image)  # Обновляем объект, чтобы получить актуальные данные
 
     def get_images(self, db):
-        """Возвращает текущее изображение из БД"""
-        image_entry = db.query(ImageDistortion).first()
-        if image_entry:
-            return base64.b64encode(image_entry.image_data).decode("utf-8")
-        return None
+        """Возвращает текущие изображения из БД"""
+        image_entry = db.query(ImageColorCorrection).all()
 
-    def get_image_type(self, db):
-        """Возвращает текущий тип изображения из БД"""
-        image_entry = db.query(ImageColorCorrection).first()
+        if db.query(ImageColorCorrection).count() == 0:
+            print(f"Таблица {ImageColorCorrection.__tablename__} данных пуста")
+            return None
 
-        if image_entry:
-            return image_entry.mime_type
-        return None
+        images = []  # Список для хранения изображений
+        for img in image_entry:
+            encoded_image = base64.b64encode(img.image_data).decode("utf-8")
+            images.append({
+                "mime_type": img.mime_type,
+                "encoded_image": encoded_image
+            })
+        return images
+
+    def save_images(self, db):
+        pass
+
 
 
 class Distortion(ImageProcessing):
@@ -113,18 +125,23 @@ class Distortion(ImageProcessing):
             db.refresh(new_image)  # Обновляем объект, чтобы получить актуальные данные
 
     def get_images(self, db):
-        """Возвращает текущее изображение из БД"""
-        image_entry = db.query(ImageDistortion).first()
-        if image_entry:
-            return base64.b64encode(image_entry.image_data).decode("utf-8")
-        return None
+        """Возвращает текущие изображения из БД"""
+        image_entry = db.query(ImageDistortion).all()
+        if db.query(ImageDistortion).count() == 0:
+            print(f"Таблица {ImageDistortion.__tablename__} данных пуста")
+            return None
 
-    def get_image_type(self, db):
-        """Возвращает текущий тип изображения из БД"""
-        image_entry = db.query(ImageDistortion).first()
-        if image_entry:
-            return image_entry.mime_type
-        return None
+        images = []  # Список для хранения изображений
+        for img in image_entry:
+            encoded_image = base64.b64encode(img.image_data).decode("utf-8")
+            images.append({
+                "mime_type": img.mime_type,
+                "encoded_image": encoded_image
+            })
+        return images
+
+    def save_images(self, db, save_dir):
+        pass
 
 
 # Фабрика

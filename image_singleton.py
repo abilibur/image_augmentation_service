@@ -1,5 +1,6 @@
 import base64
-from database_models import ImageDB
+from database_models import ImageDB, ImageRotate, ImageColorCorrection, ImageDistortion
+
 
 class ImageSingleton:
     __instance = None
@@ -13,6 +14,9 @@ class ImageSingleton:
         """Загружает новое изображение, заменяя предыдущее в базе данных"""
         # Удаляем предыдущее изображение
         db.query(ImageDB).delete()
+        db.query(ImageRotate).delete()
+        db.query(ImageColorCorrection).delete()
+        db.query(ImageDistortion).delete()
 
         # Добавляем новое изображение
         new_image = ImageDB(image_data=image_data, mime_type=file_type)
