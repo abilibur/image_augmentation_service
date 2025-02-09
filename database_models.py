@@ -8,6 +8,7 @@ Base = declarative_base()
 class ImageDB(Base):
     __tablename__ = "images"  # имя таблицы
     id = Column(Integer, primary_key=True, index=True)  # Уникальный ID
+    file_name = Column(String, nullable=False) # имя загруженного файла
     image_data = Column(LargeBinary, nullable=False)  # Хранит байтовые данные изображения (тип BLOB в SQLite))
     mime_type = Column(String, nullable=False)  # MIME-тип - тип изображения (jpeg, png и т. д.)
 
@@ -15,6 +16,7 @@ class ImageDB(Base):
 # Модель ImageDB представляет собой таблицу с именем images
 class ImageRotate(Base):
     __tablename__ = "rotate_images"  # имя таблицы
+    file_name = Column(String, nullable=False)  # имя загруженного файла
     id = Column(Integer, primary_key=True, index=True)  # Уникальный ID
     image_data = Column(LargeBinary, nullable=False)  # Хранит байтовые данные изображения (тип BLOB в SQLite))
     mime_type = Column(String, nullable=False)  # MIME-тип - тип изображения (jpeg, png и т. д.)
@@ -23,6 +25,7 @@ class ImageRotate(Base):
 # Модель ImageDB представляет собой таблицу с именем images
 class ImageColorCorrection(Base):
     __tablename__ = "color_correction_images"  # имя таблицы
+    file_name = Column(String, nullable=False)  # имя загруженного файла
     id = Column(Integer, primary_key=True, index=True)  # Уникальный ID
     image_data = Column(LargeBinary, nullable=False)  # Хранит байтовые данные изображения (тип BLOB в SQLite))
     mime_type = Column(String, nullable=False)  # MIME-тип - тип изображения (jpeg, png и т. д.)
@@ -31,6 +34,7 @@ class ImageColorCorrection(Base):
 # Модель ImageDB представляет собой таблицу с именем images
 class ImageDistortion(Base):
     __tablename__ = "distortion_images"  # имя таблицы
+    file_name = Column(String, nullable=False)  # имя загруженного файла
     id = Column(Integer, primary_key=True, index=True)  # Уникальный ID
     image_data = Column(LargeBinary, nullable=False)  # Хранит байтовые данные изображения (тип BLOB в SQLite))
     mime_type = Column(String, nullable=False)  # MIME-тип - тип изображения (jpeg, png и т. д.)

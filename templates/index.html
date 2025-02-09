@@ -7,33 +7,33 @@
 </head>
 
 <body class="d-flex flex-column h-100 bg-light">
-    <main class="flex-shrink-0">
+<main class="flex-shrink-0">
 
-        <!-- Навигация -->
-        <nav class="navbar navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">Аугментация изображений</a>
-                <nav>
-                    <a href="/" class="text-white text-decoration-none me-3">Загрузка изображения</a> |
-                    <a href="/rotate" class="text-white text-decoration-none me-3">Поворот</a> |
-                    <a href="/color_correction" class="text-white text-decoration-none me-3">Цветокоррекция</a> |
-                    <a href="/distortion" class="text-white text-decoration-none me-3">Искажение</a> |
-                </nav>
-            </div>
-        </nav>
+    <!-- Навигация -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Аугментация изображений</a>
+            <nav>
+                <a href="/" class="text-white text-decoration-none me-3">Загрузка изображения</a> |
+                <a href="/rotate" class="text-white text-decoration-none me-3">Поворот</a> |
+                <a href="/color_correction" class="text-white text-decoration-none me-3">Цветокоррекция</a> |
+                <a href="/distortion" class="text-white text-decoration-none me-3">Искажение</a> |
+            </nav>
+        </div>
+    </nav>
 
-        <!-- Основной контент -->
-        <div class="container mt-4">
-            {% block content %}
-            <h1 class="mb-4">Загрузка изображений</h1>
-            <div class="row">
-                <div class="col-12 mb-3">
-                    <div class="card shadow w-100">
-                        <div class="card-body">
+    <!-- Основной контент -->
+    <div class="container mt-4">
+        {% block content %}
+        <h1 class="mb-4">Загрузка изображений</h1>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <div class="card shadow w-100">
+                    <div class="card-body">
                         <h5>Загрузите ваше изображение</h5>
 
                         <form action="/" method="post" enctype="multipart/form-data">
-                            <input type="file" name="file" accept="image/*" required >
+                            <input type="file" name="file" accept="image/*" required>
                             <button type="submit " class="btn btn-success">Загрузка</button>
                         </form>
 
@@ -41,39 +41,39 @@
                         <div style="color: red;">{{ error }}</div>
                         {% endif %}
 
-                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="row">
-                <div class="col-12 mb-3">
-                    <div class="card shadow w-100">
-                        <div class="card-body">
-                            {% if encoded_image %}
-                            <h5>Ваше изображение:</h5>
-                            <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
-                                alt="Загруженное изображение"
-                                class="mb-4 img-fluid">
-                            {% else %}
-                            <p>Изображение не загружено</p>
-                            {% endif %}
-                        </div>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <div class="card shadow w-100">
+                    <div class="card-body">
+                        {% if encoded_image %}
+                        <h5>Ваше изображение:</h5>
+                        <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
+                             alt="Загруженное изображение"
+                             class="mb-4 img-fluid">
+                        {% else %}
+                        <p>Изображение не загружено</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-            {% endblock %}
         </div>
+        {% endblock %}
+    </div>
 
-    </main>
+</main>
 
-    <footer class="bg-dark text-white mt-auto py-3">
-        <div class="container text-center">
-            &copy; by abilibur
-        </div>
-    </footer>
+<footer class="bg-dark text-white mt-auto py-3">
+    <div class="container text-center">
+        &copy; by abilibur
+    </div>
+</footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 

@@ -3,19 +3,19 @@
 {% block content %}
 <h1 class="mb-4">Давайте сделаем набор картинок с поворотом</h1>
 
-    <!-- Поля и кнопки -->
+<!-- Поля и кнопки -->
 <div class="d-flex gap-1 mb-4">
     <form action="/do_rotate" method="post" class="d-flex flex-wrap gap-1 align-items-center mb-4">
         <div class="d-flex align-items-center mb-4">
             <label for="angle" class="form-label me-1">Шаг угла (°):</label>
             <input type="number" id="angle" name="angle" class="form-control w-25 me-1" required>
         </div>
-            <div class="d-flex align-items-center mb-4">
+        <div class="d-flex align-items-center mb-4">
             <label for="count" class="form-label me-1">Кол-во изображений:</label>
             <input type="number" id="count" name="count" class="form-control w-25 me-1" required>
         </div>
         <div class="d-flex gap-1 mb-4 ">
-            <button type="submit" class="btn btn-primary">Повернуть</button>
+            <button type="submit" class="btn btn-primary">Сгенерировать</button>
         </div>
     </form>
     <form action="/save_rotate" method="post" class="d-flex flex-wrap gap-1 align-items-center mb-4">
@@ -24,22 +24,23 @@
         </div>
     </form>
 </div>
-    <div class="row">
-        {% if rotate_images %}
-        {% for img in rotate_images %}
-        <div class="col-md-4 mb-3">
-            <div class="card shadow">
-                <div class="card-body text-center">
-                    <h5>Изображение {{loop.index}}</h5>
-                    <img src="data:{{ img.mime_type }};base64,{{ img.encoded_image }}"
-                         alt="Изображение {{ loop.index }}"
-                         class="img-fluid mb-2">
-                </div>
+
+<div class="row">
+    {% if rotate_images %}
+    {% for img in rotate_images %}
+    <div class="col-md-4 mb-3">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <h5>Изображение {{loop.index}}</h5>
+                <img src="data:{{ img.mime_type }};base64,{{ img.encoded_image }}"
+                     alt="Изображение {{ loop.index }}"
+                     class="img-fluid mb-2">
             </div>
         </div>
-        {% endfor %}
-        {% else %}
-            <p>Введите параметры для поворота</p>
-        {% endif %}
     </div>
+    {% endfor %}
+    {% else %}
+    <p>Введите параметры для поворота</p>
+    {% endif %}
+</div>
 {% endblock %}

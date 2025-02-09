@@ -53,11 +53,8 @@ async def upload_image(request: Request, file: UploadFile = File(...), db = Depe
         })
     # Читаем файл
     image_data = await file.read()
-    
-    # Получаем имя загруженного файла
-    filename = file.filename
     # Загружаем данные файла в класс Singleton
-    img.set_image_with_type(db, image_data, file.content_type)
+    img.set_image_with_type(db, file.filename, image_data, file.content_type)
 
     return templates.TemplateResponse("index.html", {
         "request": request,
@@ -100,7 +97,8 @@ async def save_images(request: Request, db = Depends(get_db), save_dir=SAVE_DIR)
 
 @app.get("/color_correction", response_class=HTMLResponse)
 async def color_correction(request: Request, db = Depends(get_db)):
-    # color_correction_process.generate_images(db, options)
+    options = dict()
+    color_correction_process.generate_images(db, options)
     return templates.TemplateResponse("color_correction.html", {
         "request": request,
         "color_correction_images": color_correction_process.get_images(db)
