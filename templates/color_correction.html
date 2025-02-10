@@ -5,19 +5,25 @@
 
 <!-- Поля и кнопки-->
 <div class="d-flex flex-wrap align-items-center gap-3 w-100 mb-4">
-    <form action="/do_rotate" method="post" class="d-flex flex-wrap align-items-center gap-3">
-
+    <form action="/do_color_correction" method="post" class="d-flex flex-wrap align-items-center gap-3">
         <!-- Чекбоксы -->
         <div class="d-flex flex-wrap gap-3 flex-grow-1">
-            <label>Выберите опции:</label>
+            <label>Выберите свойства для изменения:</label>
             <label>
-                <input type="checkbox" name="options" value="brightness"> Изменение яркости
+                <input type="checkbox" name="options" value="grayscale"
+                       {% if 'grayscale' in selected_options %} checked {% endif %}/> ЧБ
             </label>
             <label>
-                <input type="checkbox" name="options" value="contrast"> Изменение контраста
+                <input type="checkbox" name="options" value="brightness"
+                       {% if "brightness" in selected_options %} checked {% endif %}/> Яркость
             </label>
             <label>
-                <input type="checkbox" name="options" value="saturation"> Изменение насыщенности
+                <input type="checkbox" name="options" value="contrast"
+                       {% if "contrast" in selected_options %} checked {% endif %}/> Контраст
+            </label>
+            <label>
+                <input type="checkbox" name="options" value="saturation"
+                       {% if "saturation" in selected_options %} checked {% endif %}/> Насыщенность
             </label>
         </div>
 

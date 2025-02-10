@@ -2,6 +2,8 @@ from fastapi.responses import HTMLResponse
 from fastapi import FastAPI, Request, File, UploadFile, Depends, Form
 from fastapi.templating import Jinja2Templates
 
+from typing import List
+
 from database import Database
 from image_singleton import ImageSingleton
 from image_processing_factory import ImageProcessingFactory
@@ -108,10 +110,18 @@ async def save_images(request: Request, db = Depends(get_db), save_dir=SAVE_DIR)
 # ---
 @app.get("/color_correction", response_class=HTMLResponse)
 async def color_correction(request: Request, db = Depends(get_db)):
-    options = dict()
+    return templates.TemplateResponse("color_correction.html", {
+        "request": request,
+        "color_correction_images": color_correction_process.get_images(db)
+    })
+
+@app.post("/do_color_correction")
+async def color_correction(request: Request, db = Depends(get_db),
+                           options: List[str] = Form(default=[])):
     color_correction_process.generate_images(db, options)
     return templates.TemplateResponse("color_correction.html", {
         "request": request,
+        "selected_options": options,  # Передаем выбранные опции в шаблон
         "color_correction_images": color_correction_process.get_images(db)
     })
 

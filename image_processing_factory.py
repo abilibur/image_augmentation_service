@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from database_models import ImageDB, ImageRotate, ImageColorCorrection, ImageDistortion
 import base64
-from image_proceccing_methods import rotate_images
+from image_proceccing_methods import rotate_images, color_correction_images
 import os
 
 
@@ -84,15 +84,35 @@ class ColorCorrection(ImageProcessing):
     def generate_images(self, db, options):
         """Считывает загруженное пользователем изображение, на основе него
            генерирует изображения c цветовой коррекцией и записывает их в БД """
-        # Удаляем предыдущее изображение
+        # удаляем предыдущее изображение
         db.query(ImageColorCorrection).delete()
-        image_entry = db.query(ImageDB).first()
-        # Добавляем новое изображение если в таблице images есть изображение
-        if image_entry:
-            new_image = ImageColorCorrection(file_name = image_entry.file_name, image_data=image_entry.image_data, mime_type=image_entry.mime_type)
-            db.add(new_image)
-            db.commit()
-            db.refresh(new_image)  # Обновляем объект, чтобы получить актуальные данные
+        # достаем загруженное пользователем изображение
+        orig_image = db.query(ImageDB).first()
+        if db.query(ImageDB).count() == 0:
+            print(f"Таблица {ImageDB.__tablename__} данных пуста")
+            return None
+
+        # # поворачиваем изображение
+        # changed_images = color_correction_images(orig_image=orig_image, options=options)
+        #
+        # for i, img in enumerate(changed_images):
+        #     # Добавляем новое изображение если в таблице images есть изображение
+        #     file_name = orig_image.file_name + "_color_correction_" + str(i)
+        #     new_image = ImageRotate(file_name = file_name , image_data=img, mime_type="image/jpeg")
+        #     db.add(new_image)
+        #
+        # db.commit()
+
+
+        # # Удаляем предыдущее изображение
+        # db.query(ImageColorCorrection).delete()
+        # image_entry = db.query(ImageDB).first()
+        # # Добавляем новое изображение если в таблице images есть изображение
+        # if image_entry:
+        #     new_image = ImageColorCorrection(file_name = image_entry.file_name, image_data=image_entry.image_data, mime_type=image_entry.mime_type)
+        #     db.add(new_image)
+        #     db.commit()
+        #     db.refresh(new_image)  # Обновляем объект, чтобы получить актуальные данные
 
 
     def get_images(self, db):
