@@ -50,9 +50,9 @@
             <div class="col-12 mb-3">
                 <div class="card shadow w-100">
                     <div class="card-body">
-                        {% if encoded_image %}
+                        {% if orig_image.encoded_image %}
                         <h5>Ваше изображение:</h5>
-                        <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
+                        <img src="data:{{ orig_image.mime_type }};base64,{{ orig_image.encoded_image }}"
                              alt="Загруженное изображение"
                              class="mb-4 img-fluid">
                         {% else %}

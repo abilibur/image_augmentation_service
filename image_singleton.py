@@ -26,16 +26,11 @@ class ImageSingleton:
         db.refresh(new_image)  # Обновляем объект, чтобы получить актуальные данные
 
     def get_image(self, db):
-        """Возвращает текущее изображение из БД"""
+        """Возвращает текущее изображение и тип изображения из БД"""
         image_entry = db.query(ImageDB).first()
         if image_entry:
-            return base64.b64encode(image_entry.image_data).decode("utf-8")
+            return {
+                "mime_type": image_entry.mime_type,
+                "encoded_image": base64.b64encode(image_entry.image_data).decode("utf-8")
+            }
         return None
-
-    def get_image_type(self, db):
-        """Возвращает текущий тип изображения из БД"""
-        image_entry = db.query(ImageDB).first()
-        if image_entry:
-            return image_entry.mime_type
-        return None
-

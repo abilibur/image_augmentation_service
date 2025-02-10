@@ -7,17 +7,22 @@ from image_singleton import ImageSingleton
 from image_processing_factory import ImageProcessingFactory
 import os
 
+# Определим директорию хранения шаблонов JINJA
 templates = Jinja2Templates(directory="templates")
+
 # Создаём экземпляр базы данных
 db_instance = Database()
+
 # Создаем FastAPI приложение
 app = FastAPI(lifespan=db_instance.lifespan)
 
-
+# Зададим директорию для сохранения аугментированных изображений
 SAVE_DIR = "augmented_images"
 os.makedirs(SAVE_DIR, exist_ok=True)
+
 # Создаем экземпляр класса изображения
 img = ImageSingleton()
+
 # Создаем фабрику различных процессов обработки изображений
 img_factory = ImageProcessingFactory()
 rotate_process = img_factory.create_new_process("rotate")
@@ -33,13 +38,16 @@ def get_db():
     finally:
         db.close()  # закрываем соединение после выполнения запроса, чтобы избежать утечек памяти
 
+# ---
+# --- Главная страница и работа с оригинальным изображением ---
+# ---
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db = Depends(get_db)):
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "encoded_image": img.get_image(db),
-        "mime_type": img.get_image_type(db)
+        "orig_image": img.get_image(db)
     })
+
 
 @app.post("/")
 async def upload_image(request: Request, file: UploadFile = File(...), db = Depends(get_db)):
@@ -48,8 +56,7 @@ async def upload_image(request: Request, file: UploadFile = File(...), db = Depe
         return templates.TemplateResponse("index.html", {
             "request": request,
             "error": "Файл не является изображением",
-            "encoded_image": img.get_image(db),
-            "mime_type": img.get_image_type(db)
+            "orig_image": img.get_image(db)
         })
     # Читаем файл
     image_data = await file.read()
@@ -58,11 +65,13 @@ async def upload_image(request: Request, file: UploadFile = File(...), db = Depe
 
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "encoded_image": img.get_image(db),
-        "mime_type": img.get_image_type(db)
+        "orig_image": img.get_image(db)
     })
 
 
+# ---
+# --- Поворот изображения ---
+# ---
 @app.get("/rotate", response_class=HTMLResponse)
 async def rotate(request: Request, db = Depends(get_db)):
     return templates.TemplateResponse("rotate.html", {
@@ -94,7 +103,9 @@ async def save_images(request: Request, db = Depends(get_db), save_dir=SAVE_DIR)
     })
 
 
-
+# ---
+# --- Цветокоррекция изображения ---
+# ---
 @app.get("/color_correction", response_class=HTMLResponse)
 async def color_correction(request: Request, db = Depends(get_db)):
     options = dict()
@@ -104,6 +115,10 @@ async def color_correction(request: Request, db = Depends(get_db)):
         "color_correction_images": color_correction_process.get_images(db)
     })
 
+
+# ---
+# --- Искажение изображения ---
+# ---
 @app.get("/distortion", response_class=HTMLResponse)
 async def distortion(request: Request, db = Depends(get_db)):
     # distortion_process.generate_images(db)
