@@ -118,7 +118,9 @@ async def color_correction(request: Request, db = Depends(get_db)):
 @app.post("/do_color_correction")
 async def color_correction(request: Request, db = Depends(get_db),
                            options: List[str] = Form(default=[])):
+
     color_correction_process.generate_images(db, options)
+    print(f"_______________options - {options}")
     return templates.TemplateResponse("color_correction.html", {
         "request": request,
         "selected_options": options,  # Передаем выбранные опции в шаблон

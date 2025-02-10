@@ -92,27 +92,16 @@ class ColorCorrection(ImageProcessing):
             print(f"Таблица {ImageDB.__tablename__} данных пуста")
             return None
 
-        # # поворачиваем изображение
-        # changed_images = color_correction_images(orig_image=orig_image, options=options)
-        #
-        # for i, img in enumerate(changed_images):
-        #     # Добавляем новое изображение если в таблице images есть изображение
-        #     file_name = orig_image.file_name + "_color_correction_" + str(i)
-        #     new_image = ImageRotate(file_name = file_name , image_data=img, mime_type="image/jpeg")
-        #     db.add(new_image)
-        #
-        # db.commit()
+        # цветокоррекция изображение
+        changed_images = color_correction_images(orig_image=orig_image, options=options)
 
+        for i, img in enumerate(changed_images):
+            # Добавляем новое изображение если в таблице images есть изображение
+            file_name = orig_image.file_name + "_color_correction_" + str(i)
+            new_image = ImageColorCorrection(file_name = file_name , image_data=img, mime_type="image/jpeg")
+            db.add(new_image)
 
-        # # Удаляем предыдущее изображение
-        # db.query(ImageColorCorrection).delete()
-        # image_entry = db.query(ImageDB).first()
-        # # Добавляем новое изображение если в таблице images есть изображение
-        # if image_entry:
-        #     new_image = ImageColorCorrection(file_name = image_entry.file_name, image_data=image_entry.image_data, mime_type=image_entry.mime_type)
-        #     db.add(new_image)
-        #     db.commit()
-        #     db.refresh(new_image)  # Обновляем объект, чтобы получить актуальные данные
+        db.commit()
 
 
     def get_images(self, db):
