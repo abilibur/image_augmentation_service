@@ -1,21 +1,52 @@
 {% extends "index.html" %}
 
 {% block content %}
-<h1 class="mb-4">Вы выбрали искажение картинки</h1>
-    <div class="row">
-        <div class="col-12 mb-3">
-            <div class="card shadow w-100">
-                <div class="card-body">
-                    {% if encoded_image %}
-                    <h5>Ваше изображение:</h5>
-                    <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
-                         alt="Загруженное изображение"
-                         class="mb-4 img-fluid">
-                    {% else %}
-                    <p>Изображение не загружено</p>
-                    {% endif %}
-                </div>
+<h1 class="mb-4">Давайте сделаем искажение изображения</h1>
+
+<!-- Поля и кнопки-->
+<div class="d-flex flex-wrap align-items-center gap-3 w-100 mb-4">
+    <form action="/do_distortion" method="post" class="d-flex flex-wrap align-items-center gap-3">
+
+        <!-- Чекбоксы -->
+        <div class="d-flex flex-wrap gap-3 flex-grow-1">
+            <label>Выберите опции:</label>
+            <label>
+                <input type="checkbox" name="options" value="brightness"> Изменение яркости
+            </label>
+            <label>
+                <input type="checkbox" name="options" value="contrast"> Изменение контраста
+            </label>
+            <label>
+                <input type="checkbox" name="options" value="saturation"> Изменение насыщенности
+            </label>
+        </div>
+
+        <!-- Кнопка "Сгенерировать" -->
+        <div class="d-flex">
+            <button type="submit" class="btn btn-primary">Сгенерировать</button>
+        </div>
+    </form>
+
+    <!-- Отдельная форма для кнопки "Сохранить" -->
+    <form action="/save_distortion" method="post">
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </form>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-3">
+        <div class="card shadow w-100">
+            <div class="card-body">
+                {% if encoded_image %}
+                <h5>Ваше изображение:</h5>
+                <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
+                     alt="Загруженное изображение"
+                     class="mb-4 img-fluid">
+                {% else %}
+                <p>Изображение не загружено</p>
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

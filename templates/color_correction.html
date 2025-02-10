@@ -1,26 +1,39 @@
 {% extends "index.html" %}
 
 {% block content %}
-<h1 class="mb-4">Давайте сделаем цветовую коррекцию картинки</h1>
+<h1 class="mb-4">Давайте сделаем цветовую коррекцию изображения</h1>
 
-<form action="/do_color_correction" method="post" class="d-flex justify-content-between align-items-start gap-3 mb-4">
-    <div class="d-flex flex-column gap-2">
-        <label for="options">Выберите опцию:</label>
-        <select name="options" id="options">
-            <option value="all">Применить всё</option>
-            <option value="brightness">Изменение яркости</option>
+<!-- Поля и кнопки-->
+<div class="d-flex flex-wrap align-items-center gap-3 w-100 mb-4">
+    <form action="/do_rotate" method="post" class="d-flex flex-wrap align-items-center gap-3">
 
-            <option value="contrast">Изменение контраста</option>
+        <!-- Чекбоксы -->
+        <div class="d-flex flex-wrap gap-3 flex-grow-1">
+            <label>Выберите опции:</label>
+            <label>
+                <input type="checkbox" name="options" value="brightness"> Изменение яркости
+            </label>
+            <label>
+                <input type="checkbox" name="options" value="contrast"> Изменение контраста
+            </label>
+            <label>
+                <input type="checkbox" name="options" value="saturation"> Изменение насыщенности
+            </label>
+        </div>
 
-            <option value="saturation">Изменение насыщенности</option>
-        </select>
-    </div>
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Сгенерировать</button>
-        <button type="submit" formaction="/save_color_correction" class="btn btn-success">Сохранить</button>
-    </div>
-</form>
+        <!-- Кнопка "Сгенерировать" -->
+        <div class="d-flex">
+            <button type="submit" class="btn btn-primary">Сгенерировать</button>
+        </div>
+    </form>
 
+    <!-- Отдельная форма для кнопки "Сохранить" -->
+    <form action="/save_color_correction" method="post">
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </form>
+</div>
+
+<!-- Изображения -->
 <div class="row">
     {% if color_correction_images %}
     {% for img in color_correction_images %}
