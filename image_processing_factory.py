@@ -95,9 +95,9 @@ class ColorCorrection(ImageProcessing):
         # цветокоррекция изображение
         changed_images = color_correction_images(orig_image=orig_image, options=options)
 
-        for i, img in enumerate(changed_images):
+        for opt, img in zip(options, changed_images):
             # Добавляем новое изображение если в таблице images есть изображение
-            file_name = orig_image.file_name + "_color_correction_" + str(i)
+            file_name = orig_image.file_name + "_color_correction_" + opt
             new_image = ImageColorCorrection(file_name = file_name , image_data=img, mime_type="image/jpeg")
             db.add(new_image)
 
@@ -122,7 +122,19 @@ class ColorCorrection(ImageProcessing):
         return images
 
     def save_images(self, db, save_dir):
-        pass
+        """Сохранение изображений после цветокоррекции на жесткий диск пользователя"""
+        image_entry = db.query(ImageColorCorrection).all()
+
+        if db.query(ImageColorCorrection).count() == 0:
+            print(f"Таблица {ImageColorCorrection.__tablename__} данных пуста")
+            return None
+
+        for img in image_entry:
+            image_data = img.image_data
+            file_path = os.path.join(save_dir, img.file_name + ".jpg")
+
+            with open(file_path, "wb") as image_file:
+                image_file.write(image_data)
 
 
 

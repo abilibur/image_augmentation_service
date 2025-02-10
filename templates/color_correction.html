@@ -11,19 +11,27 @@
             <label>Выберите свойства для изменения:</label>
             <label>
                 <input type="checkbox" name="options" value="grayscale"
-                       {% if 'grayscale' in selected_options %} checked {% endif %}/> ЧБ
+                       {% if 'grayscale' in color_correction_options %} checked {% endif %}/> ЧБ
             </label>
             <label>
                 <input type="checkbox" name="options" value="brightness"
-                       {% if "brightness" in selected_options %} checked {% endif %}/> Яркость
+                       {% if "brightness" in color_correction_options %} checked {% endif %}/> Яркость
             </label>
             <label>
                 <input type="checkbox" name="options" value="contrast"
-                       {% if "contrast" in selected_options %} checked {% endif %}/> Контраст
+                       {% if "contrast" in color_correction_options %} checked {% endif %}/> Контраст
             </label>
             <label>
                 <input type="checkbox" name="options" value="saturation"
-                       {% if "saturation" in selected_options %} checked {% endif %}/> Насыщенность
+                       {% if "saturation" in color_correction_options %} checked {% endif %}/> Насыщенность
+            </label>
+            <label>
+                <input type="checkbox" name="options" value="hue"
+                       {% if "hue" in color_correction_options %} checked {% endif %}/> Оттенок
+            </label>
+            <label>
+                <input type="checkbox" name="options" value="inversion"
+                       {% if "inversion" in color_correction_options %} checked {% endif %}/> Инверсия
             </label>
         </div>
 

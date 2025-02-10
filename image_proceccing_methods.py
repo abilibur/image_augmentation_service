@@ -53,8 +53,29 @@ def color_correction_images(orig_image=None, options=None):
     changed_images = []
     for opt in options:
         if opt == "grayscale":
-            gray_image = cv2.cvtColor(image_array, cv2.COLOR_BGR2GRAY)
-            changed_images.append(encode_cv_to_db(gray_image))
+            grayscale_image = cv2.cvtColor(image_array, cv2.COLOR_BGR2GRAY)
+            changed_images.append(encode_cv_to_db(grayscale_image))
+        if opt == "brightness":
+            brightness_image = cv2.convertScaleAbs(image_array,alpha=1, beta=np.random.randint(-50, 50))
+            changed_images.append(encode_cv_to_db(brightness_image))
+        if opt == "contrast":
+            contrast_image = cv2.convertScaleAbs(image_array, alpha=np.random.uniform(0.5, 1.5), beta=0)
+            changed_images.append(encode_cv_to_db(contrast_image))
+        if opt == "saturation":
+            hsv = cv2.cvtColor(image_array, cv2.COLOR_BGR2HSV).astype(np.float32)
+            # Умножаем S-канал на коэффициент и ограничиваем значения в диапазоне [0, 255]
+            hsv[..., 1] = np.clip(hsv[..., 1] * np.random.uniform(0.5, 1.5), 0, 255)
+            # Преобразуем обратно в BGR
+            saturation_image = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
+            changed_images.append(encode_cv_to_db(saturation_image))
+        if opt == "hue":
+            hsv = cv2.cvtColor(image_array, cv2.COLOR_BGR2HSV).astype(np.int16)
+            hsv[..., 0] = (hsv[..., 0] + np.random.randint(-20, 20)) % 180
+            hsv_shift_image = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
+            changed_images.append(encode_cv_to_db(hsv_shift_image))
+        if opt == "inversion":
+            inverted_image = cv2.bitwise_not(image_array)
+            changed_images.append(encode_cv_to_db(inverted_image))
 
     return changed_images
 
