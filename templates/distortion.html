@@ -8,9 +8,9 @@
     <form action="/do_distortion" method="post" class="d-flex flex-wrap align-items-center gap-3">
 
         <!-- Контейнер для метки и списка -->
-        <div class="d-flex align-items-center gap-0">
+        <div class="d-flex align-items-center gap-2">
             <label for="options" class="mb-1 w-100">Выберите опцию:</label>
-            <select name="option" id="options" class="form-select w-auto">
+            <select name="options" id="options" class="form-select w-auto">
                 <option value="distortion"
                     {% if distortion_options == "distortion" %}selected{% endif %}>Деформация
                 </option>
@@ -37,20 +37,23 @@
 </div>
 
 
+<!-- Изображения -->
 <div class="row">
-    <div class="col-12 mb-3">
-        <div class="card shadow w-100">
-            <div class="card-body">
-                {% if encoded_image %}
-                <h5>Ваше изображение:</h5>
-                <img src="data:{{ mime_type }};base64,{{ encoded_image }}"
-                     alt="Загруженное изображение"
-                     class="mb-4 img-fluid">
-                {% else %}
-                <p>Изображение не загружено</p>
-                {% endif %}
+    {% if distortion_images %}
+    {% for img in distortion_images %}
+    <div class="col-md-4 mb-3">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <h5>Изображение {{loop.index}}</h5>
+                <img src="data:{{ img.mime_type }};base64,{{ img.encoded_image }}"
+                     alt="Изображение {{ loop.index }}"
+                     class="img-fluid mb-2">
             </div>
         </div>
     </div>
+    {% endfor %}
+    {% else %}
+    <p>Введите параметры для цветокоррекции</p>
+    {% endif %}
 </div>
 {% endblock %}
