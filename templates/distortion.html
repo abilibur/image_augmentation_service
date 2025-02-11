@@ -11,9 +11,18 @@
         <div class="d-flex align-items-center gap-0">
             <label for="options" class="mb-1 w-100">Выберите опцию:</label>
             <select name="option" id="options" class="form-select w-auto">
-                <option value="distortion">Деформация</option>
-                <option value="blur">Размытие</option>
-                <option value="noise">Шум</option>
+                <option value="distortion"
+                    {% if distortion_options == "distortion" %}selected{% endif %}>Деформация
+                </option>
+
+                <option value="blur"
+                    {% if distortion_options == "blur" %}selected{% endif %}>Размытие
+                </option>
+
+                <option value="noise"
+                    {% if distortion_options == "noise" %}selected{% endif %}>Шум
+                </option>
+
             </select>
         </div>
 

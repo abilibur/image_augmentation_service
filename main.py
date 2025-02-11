@@ -32,7 +32,7 @@ ROTATE_OPTIONS = {}
 color_correction_process = img_factory.create_new_process("color correction")
 COLOR_CORRECTION_OPTIONS = []
 distortion_process = img_factory.create_new_process("distortion")
-
+DISTORTION_OPTIONS = "distortion"
 
 def get_db():
     """Создаёт и управляет сессией БД"""
@@ -157,8 +157,10 @@ async def save_images(request: Request, db = Depends(get_db),
 # ---
 @app.get("/distortion", response_class=HTMLResponse)
 async def distortion(request: Request, db = Depends(get_db)):
+    global DISTORTION_OPTIONS
     # distortion_process.generate_images(db)
     return templates.TemplateResponse("distortion.html", {
         "request": request,
+        "distortion_options": DISTORTION_OPTIONS,
         "distortion_images": distortion_process.get_images(db)
     })
