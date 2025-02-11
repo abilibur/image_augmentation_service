@@ -1,6 +1,8 @@
 .venv
-/.idea/image_augmentation_service.iml
+/.idea
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
+images.db
+/augmented_images/

@@ -7,31 +7,26 @@
 <div class="d-flex flex-wrap align-items-center gap-3 w-100 mb-4">
     <form action="/do_distortion" method="post" class="d-flex flex-wrap align-items-center gap-3">
 
-        <!-- Чекбоксы -->
-        <div class="d-flex flex-wrap gap-3 flex-grow-1">
-            <label>Выберите опции:</label>
-            <label>
-                <input type="checkbox" name="options" value="brightness"> Изменение яркости
-            </label>
-            <label>
-                <input type="checkbox" name="options" value="contrast"> Изменение контраста
-            </label>
-            <label>
-                <input type="checkbox" name="options" value="saturation"> Изменение насыщенности
-            </label>
+        <!-- Контейнер для метки и списка -->
+        <div class="d-flex align-items-center gap-0">
+            <label for="options" class="mb-1 w-100">Выберите опцию:</label>
+            <select name="option" id="options" class="form-select w-auto">
+                <option value="distortion">Деформация</option>
+                <option value="blur">Размытие</option>
+                <option value="noise">Шум</option>
+            </select>
         </div>
 
         <!-- Кнопка "Сгенерировать" -->
-        <div class="d-flex">
-            <button type="submit" class="btn btn-primary">Сгенерировать</button>
-        </div>
+        <button type="submit" class="btn btn-primary">Сгенерировать</button>
     </form>
 
-    <!-- Отдельная форма для кнопки "Сохранить" -->
+    <!-- Кнопка "Сохранить" -->
     <form action="/save_distortion" method="post">
         <button type="submit" class="btn btn-success">Сохранить</button>
     </form>
 </div>
+
 
 <div class="row">
     <div class="col-12 mb-3">

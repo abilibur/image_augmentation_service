@@ -123,6 +123,7 @@ async def color_correction(request: Request, db = Depends(get_db)):
         "color_correction_images": color_correction_process.get_images(db)
     })
 
+
 @app.post("/do_color_correction")
 async def color_correction(request: Request, db = Depends(get_db),
                            options: List[str] = Form(default=[])):
@@ -136,9 +137,11 @@ async def color_correction(request: Request, db = Depends(get_db),
         "color_correction_options": COLOR_CORRECTION_OPTIONS,
         "color_correction_images": color_correction_process.get_images(db)
     })
+
+
 @app.post("/save_color_correction")
 async def save_images(request: Request, db = Depends(get_db),
-                      save_dir=SAVE_DIR, options: List[str] = Form(default=[])):
+                      save_dir=SAVE_DIR):
     color_correction_process.save_images(db, save_dir)
     global COLOR_CORRECTION_OPTIONS
     return templates.TemplateResponse("color_correction.html", {
@@ -146,6 +149,8 @@ async def save_images(request: Request, db = Depends(get_db),
         "color_correction_options": COLOR_CORRECTION_OPTIONS,
         "color_correction_images": color_correction_process.get_images(db)
     })
+
+
 
 # ---
 # --- Искажение изображения ---
