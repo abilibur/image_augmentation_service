@@ -42,7 +42,7 @@ class Database:
             conn.commit()
 
     @asynccontextmanager
-    async def lifespan(self, app: FastAPI):
+    async def lifespan(self):
         """ Асинхронный менеджер контекста для выполнения кода до и после работы сервера."""
         yield
         print("Очищаем базу перед остановкой сервера...")

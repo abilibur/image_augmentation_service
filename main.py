@@ -12,16 +12,21 @@ from image_singleton import ImageSingleton
 from image_processing_factory import ImageProcessingFactory
 import os
 
-# Определим директорию хранения шаблонов JINJA
-templates = Jinja2Templates(directory="templates")
+# определяем абсолютный путь, где хранится main.py
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Создаём экземпляр базы данных
+# определяем директорию хранения шаблонов JINJA
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+templates = Jinja2Templates(directory=TEMPLATES_DIR)
+
+# создаем экземпляр базы данных
 db_instance = Database()
 
-# Создаем FastAPI приложение
+# создаем FastAPI приложение
 app = FastAPI(lifespan=db_instance.lifespan)
 
-# Pydantic модели
+
+# Pydantic модели, для валидации передачи данных из форм в программу
 class RotateOptions(BaseModel):
     angle: int
     count: int
@@ -47,27 +52,29 @@ class DistortionOptions(BaseModel):
         return cls(options=options)
 
 
-# Зададим директорию для сохранения аугментированных изображений
-SAVE_DIR = "augmented_images"
+# задаем директорию для хранения аугментированных изображений
+SAVE_DIR = os.path.join(BASE_DIR, "augmented_images")
 os.makedirs(SAVE_DIR, exist_ok=True)
 
-# Создаем экземпляр класса изображения
+# создаем экземпляр класса изображения
 img = ImageSingleton()
-# Создаем фабрику различных процессов обработки изображений
+
+# создаем фабрику различных процессов обработки изображений
 img_factory = ImageProcessingFactory()
 rotate_process = img_factory.create_new_process("rotate")
-ROTATE_OPTIONS = {}
 color_correction_process = img_factory.create_new_process("color correction")
-COLOR_CORRECTION_OPTIONS = []
 distortion_process = img_factory.create_new_process("distortion")
+
+# глобальное хранение опций
+ROTATE_OPTIONS = {}
+COLOR_CORRECTION_OPTIONS = []
 DISTORTION_OPTIONS = "distortion"
 
-
 def get_db() -> Generator[Session, None, None]:
-    """Создаёт и управляет сессией БД"""
+    """Создание и управление сессией БД"""
     db = db_instance.SessionLocal()
     try:
-        yield db  # передаём сессию в обработчики запросов
+        yield db  # передаем сессию в обработчики запросов
     finally:
         db.close()  # закрываем соединение после выполнения запроса, чтобы избежать утечек памяти
 
@@ -77,6 +84,7 @@ def get_db() -> Generator[Session, None, None]:
 # ===
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db)):
+    """Страница /"""
     return templates.TemplateResponse(request, "index.html", {
         "orig_image": img.get_image(db)
     })
@@ -85,6 +93,7 @@ async def home(request: Request, db: Session = Depends(get_db)):
 @app.post("/")
 async def upload_image(request: Request, db: Session = Depends(get_db),
                        file: UploadFile = File(..., description="Только изображения")):
+    """Кнопка """
     if not file.content_type.startswith("image/"):
         return templates.TemplateResponse(request, "index.html", {
             "error": "Файл не является изображением",

@@ -1,7 +1,22 @@
-from fastapi.testclient import TestClient
-from main import app
+import sys
+import os
+import pytest
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from fastapi.testclient import TestClient
+from main import app, BASE_DIR
+from database import Database
 client = TestClient(app)
+
+
+@pytest.fixture(scope='session', autouse=True)
+def clear_database():
+    db = Database()
+    # Очистка базы перед тестами
+    db.clear_database()
+    yield # выполняются тесты
+    # Очистка базы после всех тестов
+    db.clear_database()
 
 
 # === Тест главной страницы ===
@@ -12,7 +27,8 @@ def test_home():
 
 # === Тест загрузки изображения ===
 def test_upload_image():
-    with open("test/bus.jpg", "rb") as image_file:
+    TEST_JPG_DIR = os.path.join(BASE_DIR, "test/bus.jpg")
+    with open(TEST_JPG_DIR, "rb") as image_file:
         image_content = image_file.read()
         files = {"file": ("bus.jpg", image_content, "image/png")}
         response = client.post("/", files=files)
@@ -38,17 +54,17 @@ def test_rotate_page():
 
 # === Тест поворота изображения ===
 def test_do_rotate():
-    data = {"angle": 90, "count": 15}  # count > 100
-    response = client.post("/do_rotate", data=data)
+    options = {"angle": 10, "count": 5}  # count > 100
+    response = client.post("/do_rotate", data=options)
 
     assert response.status_code == 200
 
 
 # === Тест валидации count (слишком большое значение) ===
 def test_do_rotate_invalid_count():
-    data = {"angle": 90, "count": 150}  # count > 100
+    options = {"angle": 10, "count": 150}  # count > 100
 
-    response = client.post("/do_rotate", data=data)
+    response = client.post("/do_rotate", data=options)
 
     assert response.status_code == 200
     assert "Вы пытаетесь сгенерировать слишком много изображений" in response.text
@@ -69,9 +85,10 @@ def test_color_correction_page():
 
 # === Тест применения цветокоррекции ===
 def test_do_color_correction():
-    data = {"options": ["brightness", "contrast"]}  # Пример настроек
+    options = {"options": ["grayscale", "brightness", "contrast",
+                           "saturation", "hue", "inversion"]}
 
-    response = client.post("/do_color_correction", data=data)
+    response = client.post("/do_color_correction", data=options)
 
     assert response.status_code == 200
 
@@ -90,8 +107,24 @@ def test_distortion_page():
 
 
 # === Тест применения искажения ===
-def test_do_distortion():
+def test_do_distortion_distortion():
+    data = {"options": "distortion"}  # Пример настройки
+
+    response = client.post("/do_distortion", data=data)
+
+    assert response.status_code == 200
+
+
+def test_do_distortion_blur():
     data = {"options": "blur"}  # Пример настройки
+
+    response = client.post("/do_distortion", data=data)
+
+    assert response.status_code == 200
+
+
+def test_do_distortion_noise():
+    data = {"options": "noise"}  # Пример настройки
 
     response = client.post("/do_distortion", data=data)
 
