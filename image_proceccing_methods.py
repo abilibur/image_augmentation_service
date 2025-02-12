@@ -17,9 +17,10 @@ def encode_cv_to_db(array_image):
 
 def rotate_images(orig_image=None, angle=1, count=4):
     """ Метод принимает оригинальное изображение из БД и создает список из повернутых изображений"""
-    if orig_image is None:
+    if orig_image.image_data is None:
         print("There is no image")
         return
+    print(f"______________{orig_image.image_data}")
 
     image_array = decode_db_to_cv(orig_image)
     (h, w) = image_array.shape[:2]
