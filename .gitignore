@@ -1,5 +1,6 @@
 .venv
 .idea
+/.idea/
 .__pycache__
 /augmented_images/
 /test/__pycache__
