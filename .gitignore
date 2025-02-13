@@ -4,3 +4,4 @@
 /augmented_images/
 /test/__pycache__
 /test/.pytest_cache
+/database/images.db
