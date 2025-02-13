@@ -2,19 +2,20 @@
 
 Веб-сервис для создания различных деформированных изображений.\
 \
-![GitHub top language](https://img.shields.io/github/languages/top/abilibur/image_augmentation_service)
-![GitHub stars](https://img.shields.io/github/stars/abilibur/image_augmentation_service)
-![GitHub forks](https://img.shields.io/github/forks/abilibur/image_augmentation_service)
 ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat&logo=python&logoColor=white)
 ![HTML](https://img.shields.io/badge/-HTML-E34F26?style=flat&logo=html5&logoColor=white)
+---
 
 ### Описание
 
 Аугментация изображений позволяет частично решить проблему нехватки данных для машинного обучения или обучения нейронных
-сетей.\
+сетей.
+
 Данный сервис позволяет пользователю создавать пакет различных деформированных изображений на основе изображения
 выбранного пользователем.
 Так же, перед сохранением на жесткий диск изображения визуализируются для валидации деформаций пользователем.
+
+---
 
 ### Установка
 
@@ -68,6 +69,8 @@ uvicorn main:app --reload
 http://127.0.0.1:8000
 ```
 
+---
+
 ### Запуск тестирования pytest
 
 В папке с проектом выполнить:
@@ -79,9 +82,9 @@ pytest
 Знак успешного выполнения тестов:
 
 ```
-test\test_main.py .................                                                                                                    [100%]
+test\test_main.py .................                           [100%]
 
-============================================================ 17 passed in 2.69s =============================================================
+======================== 17 passed in 2.69s ========================
 ```
 
 ---
