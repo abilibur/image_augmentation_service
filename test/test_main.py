@@ -1,20 +1,25 @@
 import sys
 import os
 import pytest
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../database')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../image_processing')))
 
 from fastapi.testclient import TestClient
 from main import app, BASE_DIR
-from database import Database
+from database.database import Database
+
+
 client = TestClient(app)
 
-
+# === Добавляем
 @pytest.fixture(scope='session', autouse=True)
 def clear_database():
     db = Database()
     # Очистка базы перед тестами
     db.clear_database()
-    yield # выполняются тесты
+    yield  # выполняются тесты
     # Очистка базы после всех тестов
     db.clear_database()
 
@@ -106,7 +111,7 @@ def test_distortion_page():
     assert response.status_code == 200
 
 
-# === Тест применения искажения ===
+# === Тест применения деформации ===
 def test_do_distortion_distortion():
     data = {"options": "distortion"}  # Пример настройки
 
@@ -115,6 +120,14 @@ def test_do_distortion_distortion():
     assert response.status_code == 200
 
 
+# === Тест сохранения деформированных изображений ===
+def test_save_distortion_distortion():
+    response = client.post("/save_distortion")
+
+    assert response.status_code == 200
+
+
+# === Тест применения размытия ===
 def test_do_distortion_blur():
     data = {"options": "blur"}  # Пример настройки
 
@@ -123,6 +136,14 @@ def test_do_distortion_blur():
     assert response.status_code == 200
 
 
+# === Тест сохранения размытых изображений ===
+def test_save_distortion_blur():
+    response = client.post("/save_distortion")
+
+    assert response.status_code == 200
+
+
+# === Тест применения шума ===
 def test_do_distortion_noise():
     data = {"options": "noise"}  # Пример настройки
 
@@ -131,8 +152,8 @@ def test_do_distortion_noise():
     assert response.status_code == 200
 
 
-# === Тест сохранения искаженных изображений ===
-def test_save_distortion():
+# === Тест сохранения зашумленных изображений ===
+def test_save_distortion_noise():
     response = client.post("/save_distortion")
 
     assert response.status_code == 200

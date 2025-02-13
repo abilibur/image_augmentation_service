@@ -1,5 +1,5 @@
 import base64
-from database_models import ImageDB, ImageRotate, ImageColorCorrection, ImageDistortion
+from database.database_models import ImageDB, ImageRotate, ImageColorCorrection, ImageDistortion
 
 
 class ImageSingleton:

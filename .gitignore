@@ -1,8 +1,6 @@
 .venv
-/.idea
-/.idea/misc.xml
-/.idea/modules.xml
-/.idea/inspectionProfiles/profiles_settings.xml
-/.idea/vcs.xml
-images.db
+.idea
+.__pycache__
 /augmented_images/
+/test/__pycache__
+/test/.pytest_cache

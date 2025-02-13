@@ -2,14 +2,14 @@ from fastapi.responses import HTMLResponse
 from fastapi import FastAPI, Request, File, UploadFile, Depends, Form
 from fastapi.templating import Jinja2Templates
 
-from pydantic import BaseModel, conint
+from pydantic import BaseModel
 from typing import List, Generator
 
 from sqlalchemy.orm import Session
-from database import Database
+from database.database import Database
 
-from image_singleton import ImageSingleton
-from image_processing_factory import ImageProcessingFactory
+from image_processing.image_singleton import ImageSingleton
+from image_processing.image_processing_factory import ImageProcessingFactory
 import os
 
 # определяем абсолютный путь, где хранится main.py

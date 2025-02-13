@@ -1,4 +1,8 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../database')))
 from fastapi import FastAPI
+
 from sqlalchemy import create_engine, text
 
 from sqlalchemy.orm import sessionmaker
@@ -11,7 +15,7 @@ class Database:
         # Подключаемся к базе SQLite
         # check_same_thread=False — позволяет использовать одно соединение с базой
         #                           в разных потоках (нужно для FastAPI)
-        self.DATABASE_URL = "sqlite:///./images.db"
+        self.DATABASE_URL = "sqlite:///./database/images.db"
         self.engine = create_engine(self.DATABASE_URL, connect_args={"check_same_thread": False}, echo=True)
 
         # Создаём сессии для работы с БД
@@ -42,7 +46,7 @@ class Database:
             conn.commit()
 
     @asynccontextmanager
-    async def lifespan(self):
+    async def lifespan(self, app: FastAPI):
         """ Асинхронный менеджер контекста для выполнения кода до и после работы сервера."""
         yield
         print("Очищаем базу перед остановкой сервера...")

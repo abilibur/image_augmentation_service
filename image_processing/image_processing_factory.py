@@ -1,7 +1,11 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../image_processing')))
+
 from abc import ABC, abstractmethod
-from database_models import ImageDB, ImageRotate, ImageColorCorrection, ImageDistortion
+from database.database_models import ImageDB, ImageRotate, ImageColorCorrection, ImageDistortion
 import base64
-from image_proceccing_methods import rotate_images, color_correction_images, distortion_images
+from image_processing_methods import rotate_images, color_correction_images, distortion_images
 import os
 
 
