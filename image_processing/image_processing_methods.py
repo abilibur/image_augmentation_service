@@ -126,16 +126,16 @@ def distortion_images(orig_image=None, options=""):
         perspective_image = cv2.warpPerspective(image_array, matrix, (width, height))
         changed_images.append(encode_cv_to_db(perspective_image))
 
-        # эластичная деформация
+        # случайная эластичная деформация
         shape = image_array.shape
-        # генерируем случайные смещения с гауссовым фильтром
+            # генерируем случайные смещения с гауссовым фильтром
         dx = gaussian_filter((np.random.rand(*shape[:2]) * 2 - 1), 5, mode="constant", cval=0) * 35
         dy = gaussian_filter((np.random.rand(*shape[:2]) * 2 - 1), 5, mode="constant", cval=0) * 35
 
         x, y = np.meshgrid(np.arange(shape[1]), np.arange(shape[0]))
         indices = (np.clip(y + dy, 0, shape[0] - 1).astype(np.float32),
                    np.clip(x + dx, 0, shape[1] - 1).astype(np.float32))
-        # создаем карту смещений
+            # создаем карту смещений
         distorted_image = cv2.remap(image_array, indices[1], indices[0], interpolation=cv2.INTER_LINEAR,
                                     borderMode=cv2.BORDER_REFLECT)
         changed_images.append(encode_cv_to_db(distorted_image))
@@ -158,12 +158,12 @@ def distortion_images(orig_image=None, options=""):
     if options == "noise":
         # ШУМ
 
-        # добавляем шум "соль и перец"
+        # случайный шум "соль и перец"
         height, width = image_array.shape[:2]
-        # добавляем белые точки - соль
+            # добавляем белые точки - соль
         num_salt = int(0.02 * height * width)
         salt_coords = (np.random.randint(0, height, num_salt), np.random.randint(0, width, num_salt))
-        # добавляем черные точки - перец
+            # добавляем черные точки - перец
         num_pepper = int(0.02 * height * width)
         pepper_coords = (np.random.randint(0, height, num_pepper), np.random.randint(0, width, num_pepper))
 
@@ -175,12 +175,12 @@ def distortion_images(orig_image=None, options=""):
             image_array[pepper_coords] = 0
         changed_images.append(encode_cv_to_db(image_array))
 
-        # гауссов шум с меньшей интенсивностью
+        # гауссов шум (низкая интенсивность)
         gaussian_low = np.random.normal(20, 20, image_array.shape).astype(np.uint8)
         gauss_image_low = cv2.add(image_array, gaussian_low)
         changed_images.append(encode_cv_to_db(gauss_image_low))
 
-        # гауссов шум с большей интенсивностью
+        # гауссов шум (высокая интенсивность)
         gaussian_high = np.random.normal(0, 10, image_array.shape).astype(np.uint8)
         gauss_image_high = cv2.add(image_array, gaussian_high)
         changed_images.append(encode_cv_to_db(gauss_image_high))
