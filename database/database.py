@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../database')))
 from fastapi import FastAPI
 
@@ -9,8 +10,10 @@ from sqlalchemy.orm import sessionmaker
 from contextlib import asynccontextmanager
 from database_models import Base
 
+
 class Database:
     """Класс для управления базой данных и сессиями."""
+
     def __init__(self):
         # Подключаемся к базе SQLite
         # check_same_thread=False — позволяет использовать одно соединение с базой
@@ -26,16 +29,13 @@ class Database:
         # Создаём таблицы, если их ещё нет
         self.create_tables()
 
-
     def create_tables(self):
         """ Создает таблицы в базе данных, если их ещё нет """
         Base.metadata.create_all(bind=self.engine)
 
-
     def clear_database(self):
         """Очищает таблицу перед завершением работы сервера."""
         with self.engine.connect() as conn:
-
             conn.execute(text("DELETE FROM images"))  # Удаляем все записи images
             conn.execute(text("DELETE FROM rotate_images"))  # Удаляем все записи rotate_images
             conn.execute(text("DELETE FROM color_correction_images"))  # Удаляем все записи color_correction_images
@@ -47,7 +47,7 @@ class Database:
 
     @asynccontextmanager
     async def lifespan(self, app: FastAPI):
-        """ Асинхронный менеджер контекста для выполнения кода до и после работы сервера."""
+        """Очистка БД после работы сервера"""
         yield
         print("Очищаем базу перед остановкой сервера...")
         self.clear_database()

@@ -3,6 +3,7 @@ from database.database_models import ImageDB, ImageRotate, ImageColorCorrection,
 
 
 class ImageSingleton:
+    """Класс сохранения в базу данных и получения из базы данных оригинального изображения"""
     __instance = None
 
     def __new__(cls):
@@ -10,23 +11,26 @@ class ImageSingleton:
             cls.__instance = super().__new__(cls)
         return cls.__instance
 
-    def set_image_with_type(self,db, file_name, image_data, mime_type):
-        """Загружает новое изображение, заменяя предыдущее в базе данных"""
-        # Удаляем предыдущее изображение
+    def set_image(self, db, file_name, image_data, mime_type):
+        """Загрузка нового изображения, очистив все таблицы в базе данных."""
+        # очищаем таблицы в базе данных
         db.query(ImageDB).delete()
         db.query(ImageRotate).delete()
         db.query(ImageColorCorrection).delete()
         db.query(ImageDistortion).delete()
-        # удаляем расширение
+
+        # удаляем расширение у имени файла
         file_name = file_name.rsplit('.', 1)[0]
-        # Добавляем новое изображение
-        new_image = ImageDB(file_name=file_name,image_data=image_data, mime_type=mime_type)
+
+        # добавляем новое изображение в таблицу с оригинальных изображением
+        new_image = ImageDB(file_name=file_name, image_data=image_data, mime_type=mime_type)
         db.add(new_image)
         db.commit()
-        db.refresh(new_image)  # Обновляем объект, чтобы получить актуальные данные
+        db.refresh(new_image)  # обновляем объект, чтобы получить актуальные данные
 
     def get_image(self, db):
-        """Возвращает текущее изображение и тип изображения из БД"""
+        """Получение текущего оригинального изображения и типа изображения из базы данных"""
+        # получаем первый и единственный элемент из таблицы оригинального изображения
         image_entry = db.query(ImageDB).first()
         if image_entry:
             return {

@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../image_processing')))
 
 from abc import ABC, abstractmethod
@@ -26,22 +27,26 @@ class ImageProcessing(ABC):
 
 
 class Rotate(ImageProcessing):
-    """Класс поворота изображений"""
+    """Класс поворота изображения"""
 
     def generate_images(self, db, options):
-        """Считывает загруженное пользователем изображение, шаг угла поворота,
-           количество изображений и на основе этих данных
-           генерирует повернутые изображения и записывает их в БД """
-        # удаляем предыдущее изображение
+        """Получение загруженного пользователем оригинального изображения,
+           шага угла поворота и количества изображений. На основе этих данных
+           генерация повернутых изображений и запись их в базу данных"""
+        # очищаем таблицу с повернутыми изображениями перед генерацией новых
         db.query(ImageRotate).delete()
-        # достаем загруженное пользователем изображение
+
+        # достаем загруженное пользователем оригинальное изображение
         orig_image = db.query(ImageDB).first()
+
         if db.query(ImageDB).count() == 0:
             print(f"Таблица {ImageDB.__tablename__} данных пуста")
             return None
+
         # поворачиваем изображение
         changed_images = rotate_images(orig_image=orig_image, angle=options["angle"], count=options["count"])
 
+        # добавляем повернутые изображения в таблицу
         for i, img in enumerate(changed_images):
             file_name = orig_image.file_name + "_rotate_" + str((i + 1) * options["angle"]) + "_degrees"
             new_image = ImageRotate(file_name=file_name, image_data=img, mime_type="image/jpeg")
@@ -50,14 +55,15 @@ class Rotate(ImageProcessing):
         db.commit()
 
     def get_images(self, db):
-        """Возвращает текущие изображения из БД"""
+        """Получение текущих изображений из таблицы с повернутыми изображениями"""
+        # получаем все изображения из таблицы
         image_entry = db.query(ImageRotate).all()
 
         if db.query(ImageRotate).count() == 0:
             print(f"Таблица {ImageRotate.__tablename__} данных пуста")
             return None
 
-        images = []  # Список для хранения изображений
+        images = []
         for img in image_entry:
             encoded_image = base64.b64encode(img.image_data).decode("utf-8")
             images.append({
@@ -68,12 +74,14 @@ class Rotate(ImageProcessing):
 
     def save_images(self, db, save_dir):
         """Сохранение повернутых изображений на жесткий диск пользователя"""
+        # получаем все изображения из таблицы
         image_entry = db.query(ImageRotate).all()
 
         if db.query(ImageRotate).count() == 0:
             print(f"Таблица {ImageRotate.__tablename__} данных пуста")
             return None
 
+        # сохраняем в файл
         for img in image_entry:
             image_data = img.image_data
             file_path = os.path.join(save_dir, img.file_name + ".jpg")
@@ -86,11 +94,13 @@ class ColorCorrection(ImageProcessing):
     """Класс цветокоррекции изображений"""
 
     def generate_images(self, db, options):
-        """Считывает загруженное пользователем изображение, на основе него
-           генерирует изображения c цветовой коррекцией и записывает их в БД """
-        # удаляем предыдущее изображение
+        """Получение загруженного пользователем оригинального изображения и
+           опций цветокоррекции из нажатых чекбоксов. На основе этих данных
+           генерация изображений c цветовой коррекцией и запись их в базу данных"""
+        # очищаем таблицу изображений с цветокоррекцией перед генерацией новых
         db.query(ImageColorCorrection).delete()
-        # достаем загруженное пользователем изображение
+
+        # достаем загруженное пользователем оригинальное изображение
         orig_image = db.query(ImageDB).first()
         if db.query(ImageDB).count() == 0:
             print(f"Таблица {ImageDB.__tablename__} данных пуста")
@@ -99,6 +109,7 @@ class ColorCorrection(ImageProcessing):
         # цветокоррекция изображения
         changed_images = color_correction_images(orig_image=orig_image, options=options)
 
+        # добавляем изображения с цветокоррекцией в таблицу
         for opt, img in zip(options, changed_images):
             file_name = orig_image.file_name + "_color_correction_" + opt
             new_image = ImageColorCorrection(file_name=file_name, image_data=img, mime_type="image/jpeg")
@@ -107,7 +118,8 @@ class ColorCorrection(ImageProcessing):
         db.commit()
 
     def get_images(self, db):
-        """Возвращает текущие изображения из БД"""
+        """Получение текущих изображений из таблицы изображений с цветокоррекцией"""
+        # получаем все изображения из таблицы
         image_entry = db.query(ImageColorCorrection).all()
 
         if db.query(ImageColorCorrection).count() == 0:
@@ -124,13 +136,16 @@ class ColorCorrection(ImageProcessing):
         return images
 
     def save_images(self, db, save_dir):
-        """Сохранение изображений после цветокоррекции на жесткий диск пользователя"""
+        """Сохранение изображений с цветокоррекцией на жесткий диск пользователя"""
+
+        # получаем все изображения из таблицы
         image_entry = db.query(ImageColorCorrection).all()
 
         if db.query(ImageColorCorrection).count() == 0:
             print(f"Таблица {ImageColorCorrection.__tablename__} данных пуста")
             return None
 
+        # сохраняем в файл
         for img in image_entry:
             image_data = img.image_data
             file_path = os.path.join(save_dir, img.file_name + ".jpg")
@@ -143,11 +158,13 @@ class Distortion(ImageProcessing):
     """Класс искажения изображений"""
 
     def generate_images(self, db, options):
-        """Считывает загруженное пользователем изображение, на основе него
-           генерирует искаженные изображения и записывает их в БД """
-        # удаляем предыдущее изображение
+        """Получение загруженного пользователем оригинального изображения и
+           типа искажения выбранного в выпадающем меню. На основе этих данных
+           генерация изображений c искажениями и запись их в базу данных"""
+        # очищаем таблицу изображений с искажениями перед генерацией новых
         db.query(ImageDistortion).delete()
-        # достаем загруженное пользователем изображение
+
+        # достаем загруженное пользователем оригинальное изображение
         orig_image = db.query(ImageDB).first()
         if db.query(ImageDB).count() == 0:
             print(f"Таблица {ImageDB.__tablename__} данных пуста")
@@ -156,21 +173,23 @@ class Distortion(ImageProcessing):
         # искажение изображения
         changed_images = distortion_images(orig_image=orig_image, options=options)
 
+        # добавляем изображения с искажениями в таблицу
         for i, img in enumerate(changed_images):
-            file_name = orig_image.file_name + "_" + options + "_" + str(i+1)
+            file_name = orig_image.file_name + "_" + options + "_" + str(i + 1)
             new_image = ImageDistortion(file_name=file_name, image_data=img, mime_type="image/jpeg")
             db.add(new_image)
 
         db.commit()
 
     def get_images(self, db):
-        """Возвращает текущие изображения из БД"""
+        """Получение текущих изображений из таблицы изображений с искажениями"""
+        # получаем все изображения из таблицы
         image_entry = db.query(ImageDistortion).all()
         if db.query(ImageDistortion).count() == 0:
             print(f"Таблица {ImageDistortion.__tablename__} данных пуста")
             return None
 
-        images = []  # Список для хранения изображений
+        images = []
         for img in image_entry:
             encoded_image = base64.b64encode(img.image_data).decode("utf-8")
             images.append({
@@ -181,12 +200,14 @@ class Distortion(ImageProcessing):
 
     def save_images(self, db, save_dir):
         """Сохранение изображений после искажения на жесткий диск пользователя"""
+        # получаем все изображения из таблицы
         image_entry = db.query(ImageDistortion).all()
 
         if db.query(ImageDistortion).count() == 0:
             print(f"Таблица {ImageDistortion.__tablename__} данных пуста")
             return None
 
+        # сохраняем в файл
         for img in image_entry:
             image_data = img.image_data
             file_path = os.path.join(save_dir, img.file_name + ".jpg")
@@ -195,7 +216,7 @@ class Distortion(ImageProcessing):
                 image_file.write(image_data)
 
 
-# Фабрика
+# Фабрика обработки оригинального изображения
 class ImageProcessingFactory:
     @staticmethod
     def create_new_process(processing_type: str) -> ImageProcessing:

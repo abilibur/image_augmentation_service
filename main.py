@@ -70,6 +70,7 @@ ROTATE_OPTIONS = {}
 COLOR_CORRECTION_OPTIONS = []
 DISTORTION_OPTIONS = "distortion"
 
+
 def get_db() -> Generator[Session, None, None]:
     """Создание и управление сессией БД"""
     db = db_instance.SessionLocal()
@@ -84,7 +85,7 @@ def get_db() -> Generator[Session, None, None]:
 # ===
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db)):
-    """Страница /"""
+    """Главная страница"""
     return templates.TemplateResponse(request, "index.html", {
         "orig_image": img.get_image(db)
     })
@@ -93,14 +94,17 @@ async def home(request: Request, db: Session = Depends(get_db)):
 @app.post("/")
 async def upload_image(request: Request, db: Session = Depends(get_db),
                        file: UploadFile = File(..., description="Только изображения")):
-    """Кнопка """
+    """Выбор файла и загрузка"""
+    # проверяем что файл точно изображение
     if not file.content_type.startswith("image/"):
         return templates.TemplateResponse(request, "index.html", {
             "error": "Файл не является изображением",
             "orig_image": img.get_image(db)
         })
     image_data = await file.read()
-    img.set_image_with_type(db, file.filename, image_data, file.content_type)
+
+    # добавляем изображение в базу данных
+    img.set_image(db, file.filename, image_data, file.content_type)
 
     return templates.TemplateResponse(request, "index.html", {
         "orig_image": img.get_image(db)
@@ -112,6 +116,7 @@ async def upload_image(request: Request, db: Session = Depends(get_db),
 # ===
 @app.get("/rotate", response_class=HTMLResponse)
 async def rotate(request: Request, db: Session = Depends(get_db)):
+    """Страница Поворот"""
     global ROTATE_OPTIONS
 
     return templates.TemplateResponse(request, "rotate.html", {
@@ -123,18 +128,23 @@ async def rotate(request: Request, db: Session = Depends(get_db)):
 @app.post("/do_rotate")
 async def do_rotate(request: Request, db: Session = Depends(get_db),
                     options: RotateOptions = Depends(RotateOptions.as_form)):
+    """Кнопка Сгенерировать"""
     global ROTATE_OPTIONS
+
+    # берем опции из формы
     ROTATE_OPTIONS = options.model_dump()
+
+    # проверяем значения введенных пользователем и выводим предупреждения для некоторых значений
+    if ROTATE_OPTIONS["count"] < 1:
+        return templates.TemplateResponse(request, "rotate.html", {
+            "rotate_options": ROTATE_OPTIONS,
+            "error": "Вы пытаетесь повернуть ничто",
+            "rotate_images": rotate_process.get_images(db)
+        })
     if ROTATE_OPTIONS["count"] > 100:
         return templates.TemplateResponse(request, "rotate.html", {
             "rotate_options": ROTATE_OPTIONS,
             "error": "Вы пытаетесь сгенерировать слишком много изображений",
-            "rotate_images": rotate_process.get_images(db)
-        })
-    if ROTATE_OPTIONS["count"] < 1:
-        return templates.TemplateResponse(request, "rotate.html", {
-            "rotate_options": ROTATE_OPTIONS,
-            "error": "Вы пытаетесь повернуть изображение ничего раз и даже меньше",
             "rotate_images": rotate_process.get_images(db)
         })
     if ROTATE_OPTIONS["angle"] == 0:
@@ -144,6 +154,7 @@ async def do_rotate(request: Request, db: Session = Depends(get_db),
             "rotate_images": rotate_process.get_images(db)
         })
 
+    # поворачиваем изображения и записываем в базу данных полученные изображения
     rotate_process.generate_images(db, ROTATE_OPTIONS)
 
     return templates.TemplateResponse(request, "rotate.html", {
@@ -155,7 +166,10 @@ async def do_rotate(request: Request, db: Session = Depends(get_db),
 @app.post("/save_rotate")
 async def save_rotate(request: Request, db: Session = Depends(get_db),
                       save_dir=SAVE_DIR):
+    """Кнопка Сохранить"""
     global ROTATE_OPTIONS
+
+    # сохраняем повернутые изображения на жесткий диск
     rotate_process.save_images(db, save_dir)
 
     return templates.TemplateResponse(request, "rotate.html", {
@@ -169,6 +183,7 @@ async def save_rotate(request: Request, db: Session = Depends(get_db),
 # ===
 @app.get("/color_correction", response_class=HTMLResponse)
 async def color_correction(request: Request, db: Session = Depends(get_db)):
+    """Страница Цветокоррекции"""
     global COLOR_CORRECTION_OPTIONS
 
     return templates.TemplateResponse(request, "color_correction.html", {
@@ -180,9 +195,13 @@ async def color_correction(request: Request, db: Session = Depends(get_db)):
 @app.post("/do_color_correction")
 async def do_color_correction(request: Request, db: Session = Depends(get_db),
                               options: ColorCorrectionOptions = Depends(ColorCorrectionOptions.as_form)):
+    """Кнопка Сгенерировать"""
     global COLOR_CORRECTION_OPTIONS
+
+    # берем опции из формы
     COLOR_CORRECTION_OPTIONS = options.options
 
+    # делаем цветокоррекцию изображения и записываем в базу данных полученные изображения
     color_correction_process.generate_images(db, COLOR_CORRECTION_OPTIONS)
 
     return templates.TemplateResponse(request, "color_correction.html", {
@@ -194,7 +213,10 @@ async def do_color_correction(request: Request, db: Session = Depends(get_db),
 @app.post("/save_color_correction")
 async def save_color_correction(request: Request, db: Session = Depends(get_db),
                                 save_dir=SAVE_DIR):
+    """Кнопка Сохранить"""
     global COLOR_CORRECTION_OPTIONS
+
+    # сохраняем изображения с цветокоррекцией на жесткий диск
     color_correction_process.save_images(db, save_dir)
 
     return templates.TemplateResponse(request, "color_correction.html", {
@@ -208,6 +230,7 @@ async def save_color_correction(request: Request, db: Session = Depends(get_db),
 # ===
 @app.get("/distortion", response_class=HTMLResponse)
 async def distortion(request: Request, db: Session = Depends(get_db)):
+    """Страница Искажение"""
     global DISTORTION_OPTIONS
 
     return templates.TemplateResponse(request, "distortion.html", {
@@ -219,8 +242,13 @@ async def distortion(request: Request, db: Session = Depends(get_db)):
 @app.post("/do_distortion")
 async def do_distortion(request: Request, db: Session = Depends(get_db),
                         options: DistortionOptions = Depends(DistortionOptions.as_form)):
+    """Кнопка Сгенерировать"""
     global DISTORTION_OPTIONS
+
+    # берем опции из формы
     DISTORTION_OPTIONS = options.options
+
+    # делаем искажения изображения и записываем в базу данных полученные изображения
     distortion_process.generate_images(db, DISTORTION_OPTIONS)
 
     return templates.TemplateResponse(request, "distortion.html", {
@@ -232,7 +260,10 @@ async def do_distortion(request: Request, db: Session = Depends(get_db),
 @app.post("/save_distortion")
 async def save_distortion(request: Request, db: Session = Depends(get_db),
                           save_dir=SAVE_DIR):
+    """Кнопка Сохранить"""
     global DISTORTION_OPTIONS
+
+    # сохраняем изображения с искажениями на жесткий диск
     distortion_process.save_images(db, save_dir)
 
     return templates.TemplateResponse(request, "distortion.html", {

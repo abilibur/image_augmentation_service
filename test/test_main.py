@@ -13,14 +13,15 @@ from database.database import Database
 
 client = TestClient(app)
 
-# === Добавляем
+
+# === Добавляем работу с базой данных для тестов ===
 @pytest.fixture(scope='session', autouse=True)
 def clear_database():
     db = Database()
-    # Очистка базы перед тестами
+    # очищаем базу данных перед тестами
     db.clear_database()
-    yield  # выполняются тесты
-    # Очистка базы после всех тестов
+    yield  # выполняем тесты
+    # очищаем базу данных после всех тестов
     db.clear_database()
 
 
@@ -33,6 +34,7 @@ def test_home():
 # === Тест загрузки изображения ===
 def test_upload_image():
     TEST_JPG_DIR = os.path.join(BASE_DIR, "test/bus.jpg")
+
     with open(TEST_JPG_DIR, "rb") as image_file:
         image_content = image_file.read()
         files = {"file": ("bus.jpg", image_content, "image/png")}
@@ -88,7 +90,7 @@ def test_color_correction_page():
     assert response.status_code == 200
 
 
-# === Тест применения цветокоррекции ===
+# === Тест цветокоррекции изображения ===
 def test_do_color_correction():
     options = {"options": ["grayscale", "brightness", "contrast",
                            "saturation", "hue", "inversion"]}
@@ -98,7 +100,7 @@ def test_do_color_correction():
     assert response.status_code == 200
 
 
-# === Тест сохранения цветокоррекции ===
+# === Тест сохранения изображений с цветокоррекцией ===
 def test_save_color_correction():
     response = client.post("/save_color_correction")
 
