@@ -1,15 +1,15 @@
 {% extends "index.html" %}
 
 {% block content %}
-<h1 class="mb-4">Давайте сделаем искажение изображения</h1>
+<h1 class="mb-4">Искажение изображения</h1>
 
-<!-- Поля и кнопки-->
+<!-- Список и кнопки-->
 <div class="d-flex flex-wrap align-items-center gap-3 w-100 mb-4">
     <form action="/do_distortion" method="post" class="d-flex flex-wrap align-items-center gap-3">
 
         <!-- Контейнер для метки и списка -->
         <div class="d-flex align-items-center gap-2">
-            <label for="options" class="mb-1 w-100">Выберите опцию:</label>
+            <label for="options" class="mb-1 w-100">Выберите эффект:</label>
             <select name="options" id="options" class="form-select w-auto">
                 <option value="distortion"
                     {% if distortion_options == "distortion" %}selected{% endif %}>Деформация
@@ -53,7 +53,7 @@
     </div>
     {% endfor %}
     {% else %}
-    <p>Введите параметры для искажения</p>
+    <p>Выберите параметр для искажения</p>
     {% endif %}
 </div>
 {% endblock %}
